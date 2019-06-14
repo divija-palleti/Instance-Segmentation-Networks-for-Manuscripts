@@ -16,13 +16,7 @@ python3 -m pip install -r requirements.txt
 ```bash
 python3 app.py
 ```
-4. Upload the image and click on submit. To generate the json, click on `Create json`. This will generate a json which can be loaded in the annotator.
 
-![app](/images/app.png)
-
-5. This also outputs the final result (Labelled regions overlaid on top of the original image) at `Instance-segmentation/main/doc/static/images/2.jpg`
-
-![Results](/images/result.png)
 
 ### To train the model
 
