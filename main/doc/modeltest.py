@@ -233,12 +233,13 @@ def runtest(img,model,dataset):
 			print(k," ith k",i)
 			ln=len(contours[i][0])
 			mid = int(ln/2)
-			k1=k[0:mid,:]
-			k2=k[mid:ln-1,:]
+			# k1=k[0:mid,:]
+			# k2=k[mid:ln-1,:]
+			k1=k[0:ln-1,:]
 			print(k1,"ith k1",i)
 			print(k1.shape,"k1shape")
-			print(k2,"ith k2",i)
-			print(k2.shape,"k2shape")
+			# print(k2,"ith k2",i)
+			# print(k2.shape,"k2shape")
 			from rdp import rdp
 			# from simplification.cutil import simplify_coords, simplify_coordsvw
 			# from polysimplify import VWSimplifier
@@ -249,21 +250,22 @@ def runtest(img,model,dataset):
       # simplifier.simplify(ratio=0.5)
 			simplifier1 = vw.Simplifier(k1)
 			# simplifier.simplify(ratio=0.5)
-			n1=int(0.015*k1.shape[0])
+			n1=int(0.020*k1.shape[0])
 			print(n1,"n1")
-			n2=int(0.025*k2.shape[0])
-			print(n2,"n2")
+			# n2=int(0.025*k2.shape[0])
+			# print(n2,"n2")
 			rdpk1=np.array(simplifier1.simplify(number=n1))
-			simplifier2 = vw.Simplifier(k2)
+			# simplifier2 = vw.Simplifier(k2)
 			# simplifier.simplify(ratio=0.5)
-			rdpk2=np.array(simplifier2.simplify(number=n2))
+			# rdpk2=np.array(simplifier2.simplify(number=n2))
 			# rdpk1= rdp(k1,epsilon=1)
 			# rdpk2= rdp(k2,epsilon=1)
 			print(rdpk1,"ith rdpk1",i)
 			print(rdpk1.shape,"rdpk1shape")
-			print(rdpk2,"ith rdpk2",i)
-			print(rdpk2.shape,"rdpk2shape")
-			final= np.concatenate((rdpk1, rdpk2), axis=0)
+			# print(rdpk2,"ith rdpk2",i)
+			# print(rdpk2.shape,"rdpk2shape")
+			# final= np.concatenate((rdpk1, rdpk2), axis=0)
+			final=rdpk1
 			print(final.shape[0],"finalshape")
 			print(final)
 			length=final.shape[0]
