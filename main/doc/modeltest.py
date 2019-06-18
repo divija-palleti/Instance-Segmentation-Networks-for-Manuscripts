@@ -25,6 +25,7 @@ from PIL import Image
 from app import *
 import urllib.request
 from skimage import io
+# from shapely.geometry import Polygon
 # 
 config = train.Config()
 DOCDATA = ROOT_DIR+"datasets/doc"
@@ -69,6 +70,7 @@ image=image_url_to_numpy_array_skimage(url=filepath)
 # # image = cv2.imdecode(image, cv2.IMREAD_COLOR)
 img=image
 print(type(img),"p")
+print(img.shape,"size")
 # cv2.imshow('ImageWindow', img)
 # cv2.waitKey()
 print("uuu")
@@ -126,6 +128,7 @@ if __name__ == '__main__':
 	load_model()
 	# app.run('0.0.0.0', debug=True)
 	with graph.as_default(): 
+		print(img.shape,"shape in __name__")
 		runtest(img,model,dataset)
 
 def get_ax(rows=1, cols=1, size=16):
@@ -134,11 +137,15 @@ def get_ax(rows=1, cols=1, size=16):
 def runtest(img,model,dataset):
 
 	import json
+	# image=img
 	image=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-	image,_,scale,padding,_=utils.resize_image(image,min_dim=256, max_dim=1024)
+	print(image.shape,"image shape1")
+	image,_,scale,scale1,padding,_=utils.resize_image(image,min_dim=256, max_dim=1024)
+	print(scale, "  ", scale1)
 	results = model.detect([image], verbose=1)
 	ax = get_ax(1)
 	r = results[0]
+	print(image.shape,"image shape before contours")
 	ccc,contours=visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], 
 	                            dataset.class_names, r['scores'], ax=ax,
 	                            title="Predictions",show_bbox=False,show_mask=True)
@@ -226,18 +233,32 @@ def runtest(img,model,dataset):
 	"""
 
 	rgns=""
+	print(scale,"scale")
+	print(scale1,"scale1")
 	for i in range(len(cls)):
 		if i!=(-1):
 			k = np.array(contours[i][0])
+			# d = k[0][0]
+			# print(type(d),"d")
+			# print(scale,"scale")
+			# k=(k *(1/scale))
+			k=k.astype(int)
+			
+			# print(k[0][0])
+			# k[:,0] = np.rint(k[:,0] * (1/ scale))
+			# k[:,1] = np.rint(k[:,1] * (1/ scale1))
+			# d = k[0][0]
+			# print(type(d),"d")
+			k= np.array(k)
 			print(k.shape,"kshape")
-			print(k," ith k",i)
+			# print(k," ith k",i)
 			ln=len(contours[i][0])
 			mid = int(ln/2)
 			# k1=k[0:mid,:]
 			# k2=k[mid:ln-1,:]
 			k1=k[0:ln-1,:]
-			print(k1,"ith k1",i)
-			print(k1.shape,"k1shape")
+			# print(k1,"ith k1",i)
+			# print(k1.shape,"k1shape")
 			# print(k2,"ith k2",i)
 			# print(k2.shape,"k2shape")
 			from rdp import rdp
@@ -251,7 +272,7 @@ def runtest(img,model,dataset):
 			simplifier1 = vw.Simplifier(k1)
 			# simplifier.simplify(ratio=0.5)
 			n1=int(0.020*k1.shape[0])
-			print(n1,"n1")
+			# print(n1,"n1")
 			# n2=int(0.025*k2.shape[0])
 			# print(n2,"n2")
 			rdpk1=np.array(simplifier1.simplify(number=n1))
@@ -260,26 +281,26 @@ def runtest(img,model,dataset):
 			# rdpk2=np.array(simplifier2.simplify(number=n2))
 			# rdpk1= rdp(k1,epsilon=1)
 			# rdpk2= rdp(k2,epsilon=1)
-			print(rdpk1,"ith rdpk1",i)
-			print(rdpk1.shape,"rdpk1shape")
+			# print(rdpk1,"ith rdpk1",i)
+			# print(rdpk1.shape,"rdpk1shape")
 			# print(rdpk2,"ith rdpk2",i)
 			# print(rdpk2.shape,"rdpk2shape")
 			# final= np.concatenate((rdpk1, rdpk2), axis=0)
 			final=rdpk1
-			print(final.shape[0],"finalshape")
-			print(final)
+			# print(final.shape[0],"finalshape")
+			print(final[0][0],"final")
 			length=final.shape[0]
 			str1=""
 			str2=""
 			for j in range(length):
 
-				str1+=str(final[j][0]-padding[0][0])
+				str1+=str(int((final[j][0]-padding[0][0])*(1/scale)))
 				
 				str1+=","
 				str1+='\n'
 			for j in range(length):
 
-				str2+=str(final[j][1]-padding[1][0])
+				str2+=str(int((final[j][1]-padding[1][0])*(1/scale)))
 				# g=0
 				str2+=","
 				str2+='\n'
