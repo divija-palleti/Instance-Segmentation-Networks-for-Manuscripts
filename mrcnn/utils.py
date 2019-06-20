@@ -450,8 +450,11 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     image_dtype = image.dtype
     # Default window (y1, x1, y2, x2) and default scale == 1.
     h, w = image.shape[:2]
+    print(h,"height_utils")
+    print(w,"width_utils")
     window = (0, 0, h, w)
     scale = 1
+    scale1 = 1
     padding = [(0, 0), (0, 0), (0, 0)]
     crop = None
 
@@ -472,9 +475,11 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
             scale = max_dim / image_max
 
     # Resize image using bilinear interpolation
-    if scale != 1:
+    if scale != 1 or scale!=1:
+        print("image resizing")
         image = resize(image, (round(h * scale), round(w * scale)),
                        preserve_range=True)
+        print(image.shape,"after resizing")
 
     # Need padding or cropping?
     if mode == "square":
@@ -487,6 +492,7 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
         padding = [(top_pad, bottom_pad), (left_pad, right_pad), (0, 0)]
         image = np.pad(image, padding, mode='constant', constant_values=0)
         window = (top_pad, left_pad, h + top_pad, w + left_pad)
+        # image=image*scale
     elif mode == "pad64":
         h, w = image.shape[:2]
         # Both sides must be divisible by 64
@@ -518,7 +524,7 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
         window = (0, 0, min_dim, min_dim)
     else:
         raise Exception("Mode {} not supported".format(mode))
-    return image.astype(image_dtype), window, scale, padding, crop
+    return image.astype(image_dtype), window, scale, scale1, padding, crop
 
 
 def resize_mask(mask, scale, padding, crop=None):
